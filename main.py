@@ -20,7 +20,7 @@ fps = 30
 def resetBall(ball_x, ball_y):
     ball_angle = randint(-45,45) / 180. * 3.14 # Angle in radians
     ball_direction = sign(random() - 0.5)
-    ball_speed = 5
+    ball_speed = 9
     # Compute ball x/y velocity based on angle and (magnitude of) speed 
     (ball_speed_x, ball_speed_y) = (ball_direction * cos(ball_angle) 
                                     * ball_speed, sin(ball_angle) * ball_speed)
@@ -126,10 +126,11 @@ while True:
         y_dist = p.rect.centery - ball.rect.centery
         dist = getVectorDist(x_dist, y_dist)
         angle = - asin(y_dist/dist)
-        max_angle = 30
-        if angle > max_angle * 3.14/180: # angle in degree
+        print angle * 180/3.14
+        max_angle = 65 * 3.14/180 # angle in radians
+        if angle > max_angle: 
             angle = max_angle
-        elif angle < -max_angle * 3.14/180: # angle in degrees
+        elif angle < -max_angle:
             angle = -max_angle
         ball_direction = sign(ball_speed_x)
         (ball_speed_x, ball_speed_y) = (ball_direction * cos(angle) 
