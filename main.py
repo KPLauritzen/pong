@@ -17,6 +17,14 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 fps = 30
 
+def resetBall(ball_x, ball_y):
+    ball_angle = randint(-45,45) / 180. * 3.14 # Angle in radians
+    ball_direction = sign(random() - 0.5)
+    ball_speed = 5
+    # Compute ball x/y velocity based on angle and (magnitude of) speed 
+    (ball_speed_x, ball_speed_y) = (ball_direction * cos(ball_angle) 
+                                    * ball_speed, sin(ball_angle) * ball_speed)
+    return (ball_speed_x, ball_speed_y)
 class Box(pygame.sprite.Sprite):
     def __init__(self, color, initial_position, size):
 
@@ -98,9 +106,11 @@ while True:
         if col_count < 20:
             ball_speed_x *= speed_multi
             ball_speed_y *= speed_multi
+    # if ball hits up/down borders, reverse y-speed
     if pygame.sprite.spritecollideany(ball, borders) != None:
         ball_speed_y = -ball_speed_y
         ball.rect.y += ball_speed_y
+    # if paddles hit up/down borders, stop moving them.
     for p in paddles:
         colBorder = pygame.sprite.spritecollideany(p, borders)
         if colBorder != None:
