@@ -126,11 +126,11 @@ while True:
         y_dist = p.rect.centery - ball.rect.centery
         dist = getVectorDist(x_dist, y_dist)
         angle = - asin(y_dist/dist)
-        maxangle = 65
-        if angle > maxangle * 3.14/180: # angle in degree
-            angle = maxangle
-        elif angle < -maxangle * 3.14/180: # angle in degrees
-            angle = -maxangle
+        max_angle = 30
+        if angle > max_angle * 3.14/180: # angle in degree
+            angle = max_angle
+        elif angle < -max_angle * 3.14/180: # angle in degrees
+            angle = -max_angle
         ball_direction = sign(ball_speed_x)
         (ball_speed_x, ball_speed_y) = (ball_direction * cos(angle) 
                                     * speed, sin(angle) * speed)
