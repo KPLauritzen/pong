@@ -85,7 +85,7 @@ divLine = Box(blueColor, (win_width/2,0), (5, win_height))
 
 # controls the balls speed increase
 col_count = 0
-speed_multi = 1.1
+speed_multi = 1.2
 # If a key is held down, send repeat KEYDOWN's
 pygame.key.set_repeat(10, 10) 
 
