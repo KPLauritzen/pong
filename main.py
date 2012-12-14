@@ -1,6 +1,15 @@
 import pygame, sys
 from pygame.locals import *
-from scipy import cos, sin, random, sign
+from math import cos, sin
+from random import random, randint
+# I need a sign function
+def sign(x):
+    if x>0:
+        return 1.0
+    elif x<0:
+        return -1.0
+    elif x == 0:
+        return 0
 
 # init() should be called before anything else pygame related
 pygame.init() 
@@ -46,8 +55,8 @@ borders = pygame.sprite.Group(upBorder, downBorder)
 # Playing with balls
 (ball_x, ball_y) = (win_width/2, win_height/2)
 ball = Box(whiteColor, (ball_x, ball_y), (25,25))
-ball_angle = random.randint(-45,45) / 180. * 3.14 # Angle in radians
-ball_direction = sign(random.rand() - 0.5)
+ball_angle = randint(-45,45) / 180. * 3.14 # Angle in radians
+ball_direction = sign(random() - 0.5)
 ball_speed = 5
 # Compute ball x/y velocity based on angle and (magnitude of) speed 
 (ball_speed_x, ball_speed_y) = (ball_direction * cos(ball_angle) * ball_speed,
