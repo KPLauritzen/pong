@@ -1,6 +1,6 @@
 import pygame, sys
 from pygame.locals import *
-from math import cos, sin
+from math import cos, sin, sqrt, asin, acos
 from random import random, randint
 # I need a sign function
 def sign(x):
@@ -64,18 +64,24 @@ paddles = pygame.sprite.Group(leftPaddle, rightPaddle)
 upBorder = Box(blueColor, (0,0), (win_width, 15))
 downBorder = Box(blueColor, (0, win_height - 15), (win_width, 15))
 borders = pygame.sprite.Group(upBorder, downBorder)
+
 # Playing with balls
 (ball_x, ball_y) = (win_width/2, win_height/2)
 ball = Box(whiteColor, (ball_x, ball_y), (25,25))
-ball_angle = randint(-45,45) / 180. * 3.14 # Angle in radians
-ball_direction = sign(random() - 0.5)
-ball_speed = 5
-# Compute ball x/y velocity based on angle and (magnitude of) speed 
-(ball_speed_x, ball_speed_y) = (ball_direction * cos(ball_angle) * ball_speed,
-                                sin(ball_angle) * ball_speed)
-
+(ball_speed_x, ball_speed_y) = resetBall(ball_x, ball_y)
 
 player_speed = 10 # in px/sec
+
+leftBorder = Box(blackColor, (0,0), (1, win_height))
+rightBorder = Box(blackColor, (win_width-1,0), (1, win_height))
+scoringBorders = pygame.sprite.Group(leftBorder, rightBorder)
+
+left_score = 0
+right_score = 0
+font = pygame.font.Font(None, 180)
+
+divLine = Box(blueColor, (win_width/2,0), (5, win_height))
+
 
 # controls the balls speed increase
 col_count = 0
@@ -87,6 +93,14 @@ pygame.key.set_repeat(10, 10)
 while True:
     # Drawing
     windowSurfaceObj.fill(blackColor)
+    leftScoreObj = font.render(str(left_score), False, blueColor)
+    rightScoreObj = font.render(str(right_score), False, blueColor)
+    score_y_offset = 60
+    left_score_x = win_width/2 - 50 - leftScoreObj.get_width()
+    right_score_x = win_width/2 + 50 + rightScoreObj.get_width()
+    windowSurfaceObj.blit(leftScoreObj, (left_score_x, score_y_offset))
+    windowSurfaceObj.blit(rightScoreObj, (right_score_x, score_y_offset))
+    windowSurfaceObj.blit(divLine.image, divLine.rect)
     # draw paddles
     for p in paddles:
         windowSurfaceObj.blit(p.image, p.rect)
@@ -95,14 +109,32 @@ while True:
         windowSurfaceObj.blit(p.image, p.rect)
     # draw ball
     windowSurfaceObj.blit(ball.image, ball.rect)
+
     
     # Move ball
     ball.rect.x += ball_speed_x
     ball.rect.y += ball_speed_y
     
     # Detect collision
-    if pygame.sprite.spritecollideany(ball, paddles) != None:
+    # If ball hits paddle, reverse x-speed
+    p = pygame.sprite.spritecollideany(ball, paddles)
+    if p != None:
+        speed = getVectorDist(ball_speed_x, ball_speed_y)
         ball_speed_x = -ball_speed_x
+        # find the angle between ball and paddle center
+        x_dist = p.rect.centerx - ball.rect.centerx
+        y_dist = p.rect.centery - ball.rect.centery
+        dist = getVectorDist(x_dist, y_dist)
+        angle = - asin(y_dist/dist)
+        maxangle = 65
+        if angle > maxangle * 3.14/180: # angle in degree
+            angle = maxangle
+        elif angle < -maxangle * 3.14/180: # angle in degrees
+            angle = -maxangle
+        ball_direction = sign(ball_speed_x)
+        (ball_speed_x, ball_speed_y) = (ball_direction * cos(angle) 
+                                    * speed, sin(angle) * speed)
+        # move ball out of paddle
         while pygame.sprite.spritecollideany(ball, paddles) != None:
             ball.rect.x += sign(ball_speed_x) * 5
         col_count += 1
@@ -123,7 +155,13 @@ while True:
                 p.rect.top = colBorder.rect.bottom +1
             else: # Collision with downBorder
                 p.rect.bottom = colBorder.rect.top -1
-
+    if pygame.sprite.spritecollideany(ball, scoringBorders) != None:
+        if ball.rect.x < win_width/2: # Ball is on left side
+            right_score += 1
+        else:
+            left_score += 1
+        ball.rect.center = (win_width/2, win_height/2)
+        (ball_speed_x, ball_speed_y) = resetBall(ball.rect.x, ball.rect.y)
     for event in pygame.event.get():
         # Making sure we can quit
         if event.type == QUIT:
