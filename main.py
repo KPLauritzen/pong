@@ -25,6 +25,10 @@ def resetBall(ball_x, ball_y):
     (ball_speed_x, ball_speed_y) = (ball_direction * cos(ball_angle) 
                                     * ball_speed, sin(ball_angle) * ball_speed)
     return (ball_speed_x, ball_speed_y)
+
+def getVectorDist(x, y):
+    return sqrt(x**2 + y**2)
+
 class Box(pygame.sprite.Sprite):
     def __init__(self, color, initial_position, size):
 
